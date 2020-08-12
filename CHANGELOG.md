@@ -1,5 +1,18 @@
 # PDO-VIA-OCI8 Changelog
 
+## v2.1.1 - 2019-12-05
+
+- Fix SQLT_NTY collection binding. [#74](https://github.com/yajra/pdo-via-oci8/pull/74), credits to @barrigapicante.
+- Fix PDO::FETCH_CLASS without PDO::FETCH_PROPS_LATE. [#75](https://github.com/yajra/pdo-via-oci8/pull/75), credits to @vlaaadislav.
+
+## v2.1.0 - 2019-11-16
+
+- Added support for PDO-style connection strings [#72](https://github.com/yajra/pdo-via-oci8/pull/72), credits to @wernerm.
+
+## v2.0.0 - 2019-09-04
+
+- Fix [#64](https://github.com/yajra/pdo-via-oci8/issues/64) for single bind params [#67](https://github.com/yajra/pdo-via-oci8/pull/67), credits to @istaveren.
+
 ## v1.4.0 - 2019-05-09
 
 - Fix [#63](https://github.com/yajra/pdo-via-oci8/issues/63) query params [#62](https://github.com/yajra/pdo-via-oci8/pull/62). Credits to @istaveren.

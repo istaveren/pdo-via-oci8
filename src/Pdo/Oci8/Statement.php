@@ -349,15 +349,12 @@ class Statement extends PDOStatement
                         $ctorargs  = [];
                     } else {
                         $className = $this->fetchClassName;
-                        $ctorargs  = $this->fetchCtorArgs;
+                        $ctorargs  = $this->fetchCtorArgs ? array_values($this->fetchCtorArgs) : [];
                     }
 
-                    if ($ctorargs) {
-                        $reflectionClass = new \ReflectionClass($className);
-                        $object          = $reflectionClass->newInstanceArgs($ctorargs);
-                    } else {
-                        $object = new $className();
-                    }
+                    $object = $fetchMode === PDO::FETCH_CLASS
+                        ? (new \ReflectionClass($className))->newInstanceWithoutConstructor()
+                        : new $className(...$ctorargs);
                 }
 
                 // Format recordsets values depending on options
@@ -384,6 +381,10 @@ class Statement extends PDOStatement
                     } else {
                         $object->$field = $value;
                     }
+                }
+
+                if ($fetchMode === PDO::FETCH_CLASS && method_exists($object, '__construct')) {
+                    $object->__construct(...$ctorargs);
                 }
 
                 return $object;
@@ -478,8 +479,18 @@ class Statement extends PDOStatement
                 $schema    = isset($options['schema']) ? $options['schema'] : '';
                 $type_name = isset($options['type_name']) ? $options['type_name'] : '';
 
-                // set params required to use custom type.
-                $variable = $this->connection->getNewCollection($type_name, $schema);
+                if (strtoupper(get_class($variable)) == "OCI-COLLECTION") {
+                    $collection_temp = $this->connection->getNewCollection($type_name, $schema);
+                    $collection_temp->assign($variable);
+
+                    $variable = $this->connection->getNewCollection($type_name, $schema);
+                    $variable->assign($collection_temp);
+
+                    $collection_temp->free();
+                } else {
+                    // set params required to use custom type.
+                    $variable = $this->connection->getNewCollection($type_name, $schema);
+                }
                 break;
 
             case SQLT_CLOB:
